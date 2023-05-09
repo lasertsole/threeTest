@@ -42,9 +42,6 @@ import { onMounted, ref } from "vue";
 
   //创建轨道控制器
   const controls = new OrbitControls( camera, renderer.domElement);
-  
-  // 设置时钟
-  const clock = new THREE.Clock();
 
   // 设置动画
   let animate1 = gsap.to(cube.position, {

@@ -45,9 +45,6 @@ import { onMounted, ref } from "vue";
   //设置控制器阻尼，让控制器更有真实效果，必须在动画循环里调用.update()。
   controls.enableDamping = true;
 
-  // 设置时钟
-  const clock = new THREE.Clock();
-
   // 设置动画
   let animate1 = gsap.to(cube.position, {
     x:5,//运动最终状态 

@@ -1,7 +1,8 @@
 <script setup>
 import * as THREE from "three";
 import gsap from "gsap";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";//导入轨道控制器
+import * as dat from "dat.gui";//导入dat.gui
 import { onMounted, ref } from "vue";
 
   //1.创建场景
@@ -31,6 +32,37 @@ import { onMounted, ref } from "vue";
   //将几何体往场景添加
   scene.add(cube);
   
+  /*以下是用户自定义设置*/
+  //初始化gui用户参数控制
+  const gui = new dat.GUI();
+  gui.add(cube.position, "x").min(0).max(5).step(0.1).name("x轴移动").onChange((value)=>{//修改物体位置
+    console.log("值被修改了:", value);
+  }).onFinishChange((value)=>{
+    console.log("完全停下来:", value);
+  });
+
+  const params = {//修改物体颜色
+    color: "#ffff00",
+    fn:()=>{//让立方体运动起来
+        gsap.to(cube.position, {x:5, duration:2, yoyo:true, repeat:-1});
+    }
+  }
+  gui.addColor(params, 'color').name("颜色").onChange((value)=>{
+    console.log("值被修改:", value);
+    cube.material.color.set(value);
+  });
+
+  gui.add(cube, "visible").name("是否显示");//设置物体是否显示
+
+  gui.add(params,"fn");//触发物体往返运动
+  
+  let folder = gui.addFolder("设置立方体");//添加折叠文件夹
+
+  folder.add(cube.material, "wireframe");//设置线框属性
+
+  //点击触发某个事件
+  /*以上是用户自定义设置*/
+
   //添加坐标轴辅助器
   const axesHelper = new THREE.AxesHelper(5);
   scene.add(axesHelper);
@@ -45,23 +77,6 @@ import { onMounted, ref } from "vue";
   //设置控制器阻尼，让控制器更有真实效果，必须在动画循环里调用.update()。
   controls.enableDamping = true;
 
-  // 设置动画
-  let animate1 = gsap.to(cube.position, {
-    x:5,//运动最终状态 
-    duration: 5,//持续时间 
-    ease: "power4.in",//运动方式
-    onStart:()=>{//开始触发函数
-      console.log("唯心主义最强强者汉偶武，终将超越计划！");
-    },
-    onComplete:()=>{//结束触发函数
-      console.log("最强强者汉偶武，在期末考试降临之际，一口气超越计划的传奇故事，你！不！要！忘！记！啦！！！！");
-    },
-    delay: 2,//延迟开始时间
-    repeat: 2,// 重复次数，-1为无限次
-    yoyo: true,//往返运动
-  });
-
-  gsap.to(cube.rotation, {x: 2 * Math.PI, duration: 5, ease: "none", repeat:-1});
   /***********实际渲染***********/
   function render(){//渲染函数 requestAnimationFrame默认传入时间
     controls.update();
@@ -89,18 +104,19 @@ import { onMounted, ref } from "vue";
     renderer.setPixelRatio(window.devicePixelRatio);
   });
 
-  function changeAnimate(){
-    if(animate1.isActive()){//判断animate1是否在运动状态
-      animate1.pause();//停止animate1
+  /*鼠标双击全屏或退出全屏*/
+  function fullScreenOrNot(){
+    if(!document.fullscreenElement){//若不存在已全屏dom,则进入全屏。分钟退出全屏
+        renderer.domElement.requestFullscreen();
     }
     else{
-      animate1.resume();//恢复animate1
+        document.exitFullscreen();
     }
   }
 </script>
 
 <template>
-  <div ref="demo" class="demo" @click="changeAnimate"></div>
+  <div ref="demo" class="demo" @click="changeAnimate" @dblclick="fullScreenOrNot"></div>
 </template>
 
 <style scoped>
