@@ -1,6 +1,8 @@
 <script setup>
 import * as THREE from "three";
+import gsap from "gsap";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";//导入轨道控制器
+import * as dat from "dat.gui";//导入dat.gui
 import { onMounted, ref } from "vue";
 
   //1.创建场景
@@ -27,49 +29,50 @@ import { onMounted, ref } from "vue";
   //导入纹理
   const textureLoader = new THREE.TextureLoader();
   const texture = textureLoader.load('./MOYA.jpg');
-  const alphaTexture = textureLoader.load('./vite.svg');//设置通道图
-  const AOTexture = textureLoader.load("./vite.svg");//环境遮挡贴图
+//   const alphaTexture = textureLoader.load('./vite.svg');//设置通道图
+//   const AOTexture = textureLoader.load("./vite.svg");//环境遮挡贴图
 
   //纹理显示设置
   texture.magFilter = THREE.NearestFilter;//纹素覆盖大于一个像素时的设置（使用时按原本像素填充，插值无效）
   texture.minFilter = THREE.NearestFilter;//纹素覆盖小于一个像素时的设置（使用时按中值算法填充像素）
 
   //创建材质
-  const basicMaterial = new THREE.MeshBasicMaterial({
+  const standardMaterial = new THREE.MeshStandardMaterial({
     color: "#ffffff",
     map: texture,
     //alphaMap: alphaTexture,//设置通道图
     //opacity: 0.5,//设置透明度
-    transparent: true,//通道过滤部分设为透明
-    aoMap: AOTexture,//设置环境光照遮挡贴图(效果类似于通道)
-    aoMapIntensity: 0.5,//设置环境光照遮挡强度
+    // transparent: true,//通道过滤部分设为透明
+    // aoMap: AOTexture,//设置环境光照遮挡贴图(效果类似于通道)
+    // aoMapIntensity: 0.5,//设置环境光照遮挡强度
   });
-  basicMaterial.side = THREE.DoubleSide;//设置内外面都有材质
+  standardMaterial.side = THREE.DoubleSide;//设置内外面都有材质
 
   //用几何体和材质合成实体
-  const cube = new THREE.Mesh(cubeGeometry,basicMaterial);
+  const cube = new THREE.Mesh(cubeGeometry,standardMaterial);
   //场景中加入实体实体
   scene.add(cube);
-
-//   //给cube添加第二组UV(相当于ps里的图层)
-//   cubeGeometry.setAttribute(
-//     "uv2",
-//     new THREE.BufferAttribute(cubeGeometry.attributes.uv.array.map,2),//创建缓冲区对象，复制cubeGeometry的uv属性(两个数值为一组，代表一个顶点)。
-//   );
-//   console.log(cubeGeometry);
   
   //6.添加坐标轴辅助器
   const axesHelper = new THREE.AxesHelper(5);
   scene.add(axesHelper);
 
-  //初始化渲染器
+  //7.增加灯光
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.1);//增加环境光（无光源，四面八方都是）
+  scene.add(ambientLight);//环境光不需要设置位置
+  const directtionaLight = new THREE.DirectionalLight(0xffffff, 0.5);//增加直照光（有光源）
+  directtionaLight.position.set(10, 10, 10);
+  scene.add(directtionaLight);
+
+  //8.初始化渲染器
   const renderer = new THREE.WebGLRenderer();
   //设置渲染的尺寸大小(相当于canvas画布)
   renderer.setSize(window.innerWidth, window.innerHeight);
 
-  //创建轨道控制器
+  //9.创建轨道控制器
   const controls = new OrbitControls( camera, renderer.domElement);
-  //设置控制器阻尼，让控制器更有真实效果，必须在动画循环里调用.update()。
+
+  //10.设置控制器阻尼，让控制器更有真实效果，必须在动画循环里调用.update()。
   controls.enableDamping = true;
 
   /***********实际渲染***********/
