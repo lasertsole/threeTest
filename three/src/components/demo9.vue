@@ -21,46 +21,23 @@ import { onMounted, ref } from "vue";
 
   //4.场景内添加相机
   scene.add(camera);
-
+  
   //添加物体
   //创建几何体
-  const cubeGeometry = new THREE.BoxGeometry(1,1,1);//创建几何体形状
-  const cubeMaterial = new THREE.MeshBasicMaterial({color: 0xffff00});//创建白色基本网格材质
-  const cube = new THREE.Mesh(cubeGeometry,cubeMaterial);//根据几何体材质创建物体
-  cube.scale.set(3,2,1);
-  cube.rotation.set(0, 0, 0, "ZYX");//物体绕x轴旋转45deg,绕y和轴旋转0deg，旋转顺序为先Z再Y后X
-  //将几何体往场景添加
-  scene.add(cube);
-  
-  /*以下是用户自定义设置*/
-  //初始化gui用户参数控制
-  const gui = new dat.GUI();
-  gui.add(cube.position, "x").min(0).max(5).step(0.1).name("x轴移动").onChange((value)=>{//修改物体位置
-    console.log("值被修改了:", value);
-  }).onFinishChange((value)=>{
-    console.log("完全停下来:", value);
-  });
-
-  const params = {//修改物体颜色
-    color: "#ffff00",
-    fn:()=>{//让立方体运动起来
-        gsap.to(cube.position, {x:5, duration:2, yoyo:true, repeat:-1});
+  for(let i=0;i<50;i++){
+    //每个三角形，需要3个顶点，每个顶点需要3个值
+    const geometry = new THREE.BufferGeometry();//创建缓存几何体
+    const positionArray = new Float32Array(9);//共有9个值
+    for(let j=0;j<9;j++){
+        positionArray[j] = Math.random() * 10 - 5;
     }
+    geometry.setAttribute("position", new THREE.BufferAttribute(positionArray, 3));//设置几何体属性，每三组值为一个面属性
+    let color = new THREE.Color(Math.random(),Math.random(),Math.random());//创建随机颜色
+    const material = new THREE.MeshBasicMaterial({color:color, transparent:true, opacity: 0.5});
+    //根据几何体和材质创建物体
+    const mesh = new THREE.Mesh(geometry, material);
+    scene.add(mesh);
   }
-  gui.addColor(params, 'color').name("颜色").onChange((value)=>{
-    console.log("值被修改:", value);
-    cube.material.color.set(value);
-  });
-
-  gui.add(cube, "visible").name("是否显示");//设置物体是否显示
-
-  gui.add(params,"fn");//触发物体往返运动
-  
-  let folder = gui.addFolder("设置立方体");//添加折叠文件夹
-
-  folder.add(cube.material, "wireframe");//设置线框属性
-
-  /*以上是用户自定义设置*/
 
   //添加坐标轴辅助器
   const axesHelper = new THREE.AxesHelper(5);

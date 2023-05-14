@@ -32,7 +32,7 @@ import { onMounted, ref } from "vue";
   //将几何体往场景添加
   scene.add(cube);
   
-  /*以下是用户自定义设置*/
+  /*********************以下是用户自定义设置*********************/
   //初始化gui用户参数控制
   const gui = new dat.GUI();
   gui.add(cube.position, "x").min(0).max(5).step(0.1).name("x轴移动").onChange((value)=>{//修改物体位置
@@ -60,7 +60,7 @@ import { onMounted, ref } from "vue";
 
   folder.add(cube.material, "wireframe");//设置线框属性
 
-  /*以上是用户自定义设置*/
+  /*********************以上是用户自定义设置*********************/
 
   //添加坐标轴辅助器
   const axesHelper = new THREE.AxesHelper(5);
