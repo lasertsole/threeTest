@@ -10,6 +10,7 @@
   import Demo9 from './components/demo9.vue';
   import Demo10 from './components/demo10.vue';
   import Demo11 from "./components/demo11.vue";
+  import Demo12 from "./components/demo12.vue";
 </script>
 
 <template>
@@ -23,7 +24,8 @@
   <!-- <Demo8></Demo8> -->
   <!-- <Demo9></Demo9> -->
   <!-- <Demo10></Demo10> -->
-  <Demo11></Demo11>
+  <!-- <Demo11></Demo11> -->
+  <Demo12></Demo12>
 </template>
 
 <style scoped>
