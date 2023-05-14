@@ -28,8 +28,9 @@ import { onMounted, ref } from "vue";
   
   //导入纹理
   const textureLoader = new THREE.TextureLoader();
-  const texture = textureLoader.load('./vite.svg');
+  const texture = textureLoader.load('./MOYA.jpg');
   const alphaTexture = textureLoader.load('./vite.svg');//设置通道图
+  const AOTexture = textureLoader.load("./vite.svg");//环境遮挡贴图
 
   //纹理显示设置
   texture.magFilter = THREE.NearestFilter;//纹素覆盖大于一个像素时的设置（使用时按原本像素填充，插值无效）
@@ -39,9 +40,11 @@ import { onMounted, ref } from "vue";
   const basicMaterial = new THREE.MeshBasicMaterial({
     color: "#ffffff",
     map: texture,
-    alphaMap: alphaTexture,//设置通道图
+    //alphaMap: alphaTexture,//设置通道图
     //opacity: 0.5,//设置透明度
     transparent: true,//通道过滤部分设为透明
+    aoMap: AOTexture,//设置环境光照遮挡贴图(效果类似于通道)
+    aoMapIntensity: 0.5,//设置环境光照遮挡强度
   });
   basicMaterial.side = THREE.DoubleSide;//设置内外面都有材质
 
@@ -50,6 +53,13 @@ import { onMounted, ref } from "vue";
   //场景中加入实体实体
   scene.add(cube);
 
+//   //给cube添加第二组UV(相当于ps里的图层)
+//   cubeGeometry.setAttribute(
+//     "uv2",
+//     new THREE.BufferAttribute(cubeGeometry.attributes.uv.array.map,2),//创建缓冲区对象，复制cubeGeometry的uv属性(两个数值为一组，代表一个顶点)。
+//   );
+//   console.log(cubeGeometry);
+  
   //6.添加坐标轴辅助器
   const axesHelper = new THREE.AxesHelper(5);
   scene.add(axesHelper);
