@@ -22,24 +22,29 @@ import { onMounted, ref } from "vue";
   
   //5.添加物体
   //创建几何体
-  const cubeGeometry = new THREE.BoxGeometry(1,1,1,200, 200);//设置长宽高为1,1,1；水平和垂直顶点数为200,200的立体
+  const cubeGeometry = new THREE.BoxGeometry(1,1,1,200, 200,200);//设置长宽高为1,1,1；顶点数为200,200,200的立体
   
   //导入纹理
   const textureLoader = new THREE.TextureLoader();
   const texture = textureLoader.load('./MOYA.jpg');
-  //导入置换贴图
-  const heightTexture = textureLoader.load('./MOYA.jpg');
+  const heightTexture = textureLoader.load('./MOYA.jpg');//导入置换图
+  const roughnessTexture = textureLoader.load('./MOYA.jpg');//导入粗糙图
+  const metalnessTexture = textureLoader.load('./MOYA.jpg');//设置金属图
 
   //纹理显示设置
   texture.magFilter = THREE.NearestFilter;//纹素覆盖大于一个像素时的设置（使用时按原本像素填充，插值无效）
   texture.minFilter = THREE.NearestFilter;//纹素覆盖小于一个像素时的设置（使用时按中值算法填充像素）
 
-  //创建材质
+  //创建纹理
   const standardMaterial = new THREE.MeshStandardMaterial({
     color: "#ffffff",
     map: texture,
     displacementMap: heightTexture,
     displacementScale: 0.05,//置换距离
+    roughness: 1,//设置表面粗糙程度
+    roughnessMap: roughnessTexture,//设置表面粗糙程度图，范围在0~1之间，结果再与roughness相乘
+    metalness:0.3,//设置表面金属度
+    metalnessMap: metalnessTexture,//设置表面金属程度图，范围在0~1之间，结果再与metalness相乘
   });
   standardMaterial.side = THREE.DoubleSide;//设置内外面都有材质
 
@@ -55,7 +60,7 @@ import { onMounted, ref } from "vue";
   //7.增加灯光
   const ambientLight = new THREE.AmbientLight(0xffffff, 0.1);//增加环境光（无光源，四面八方都是）
   scene.add(ambientLight);//环境光不需要设置位置
-  const directtionaLight = new THREE.DirectionalLight(0xffffff, 0.5);//增加直照光（有光源）
+  const directtionaLight = new THREE.DirectionalLight(0xffffff, 0.9);//增加直照光（有光源）
   directtionaLight.position.set(10, 10, 10);
   scene.add(directtionaLight);
 
