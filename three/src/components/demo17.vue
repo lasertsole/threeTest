@@ -47,6 +47,8 @@ import { onMounted, ref } from "vue";
   
   //场景中加入实体实体
   scene.add(cube);
+
+  scene.background = envMapTexture;
   
   //6.添加坐标轴辅助器
   const axesHelper = new THREE.AxesHelper(5);
