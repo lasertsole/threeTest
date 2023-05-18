@@ -17,6 +17,7 @@
   import Demo16 from "./components/demo16.vue";
   import Demo17 from "./components/demo17.vue";
   import Demo18 from "./components/demo18.vue";
+  import Demo19 from "./components/demo19.vue";
 </script>
 
 <template>
@@ -37,7 +38,8 @@
   <!-- <Demo15></Demo15> -->
   <!-- <Demo16></Demo16> -->
   <!-- <Demo17></Demo17> -->
-  <Demo18></Demo18>
+  <!-- <Demo18></Demo18> -->
+  <Demo19></Demo19>
 </template>
 
 <style scoped>
