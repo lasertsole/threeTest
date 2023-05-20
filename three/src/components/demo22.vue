@@ -2,7 +2,7 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";//导入轨道控制器
 import { onMounted, ref } from "vue";
-import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader";
+import * as dat from "dat.gui";//导入dat.gui
 
   //1.创建场景
   const scene = new THREE.Scene();
@@ -38,7 +38,7 @@ import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader";
   scene.add(sphere);
 
   //创建平面
-  const planeGeometry = new THREE.PlaneGeometry(10, 10);
+  const planeGeometry = new THREE.PlaneGeometry(50, 50);
   const plane = new THREE.Mesh(planeGeometry, material);
   plane.receiveShadow = true;//平面接收阴影
   plane.position.set(0, -1, 0);
@@ -51,13 +51,38 @@ import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader";
   scene.add(axesHelper);
 
   //7.增加灯光
-  const ambientLight = new THREE.AmbientLight(0xffffff, 0.1);//增加环境光（无光源，四面八方都是）
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.1);//增加环境光,0.1强度（无光源，四面八方都是）
   scene.add(ambientLight);//环境光不需要设置位置
-  const directtionaLight = new THREE.DirectionalLight(0xffffff, 0.9);//增加直照光（有光源）
-  directtionaLight.position.set(10, 10, 10);
-  directtionaLight.castShadow = true;//光线投下阴影
-  directtionaLight.shadow.radius = 20;
-  scene.add(directtionaLight);
+  const spotLight = new THREE.SpotLight(0xffffff, 0.9);//增加聚光灯，0.9强度（有光源
+  spotLight.position.set(5, 5, 5);
+
+  //增加灯光阴影
+  spotLight.castShadow = true;//光线投下阴影
+  spotLight.shadow.radius = 20;
+  spotLight.shadow.mapSize.set(4096, 4096);//阴影贴图分辨率
+  spotLight.target = sphere;//聚光灯聚光目标
+  spotLight.angle = Math.PI / 6;//聚光灯光线角度
+  spotLight.distance = 0;//设置聚光灯衰减距离,值越大衰减越小，但0为不衰减
+  spotLight.penumbra = 0;//聚光灯半影的衰减效果,但0为不衰减
+  spotLight.decay = 1;//光沿着距离衰减，默认为1，为2时是现实世界的衰减情况,需要开启renderer.physicallyCorrectLights
+  spotLight.intensity = 2;//调节聚光灯强度
+
+  //增加光的投射相机
+  spotLight.shadow.camera.near = 0.5;
+  spotLight.shadow.camera.far = 500;
+  spotLight.shadow.camera.top = 5;
+  spotLight.shadow.camera.bottom = -5;
+  spotLight.shadow.camera.left = -5;
+  spotLight.shadow.camera.right = 5;
+
+  scene.add(spotLight);
+  //初始化gui用户参数控制
+  const gui = new dat.GUI();
+  gui.add(sphere.position, "x").min(-5).max(5).step(0.1);
+  gui.add(spotLight, "angle").min(0).max(Math.PI / 2).step(0.1);
+  gui.add(spotLight, "distance").min(0).max(10).step(0.01);
+  gui.add(spotLight, "penumbra").min(0).max(10).step(0.01);
+  gui.add(spotLight, "decay").min(0).max(5).step(0.01);
 
   //8.初始化渲染器
   const renderer = new THREE.WebGLRenderer();
@@ -67,6 +92,8 @@ import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader";
   
   //开启环境阴影贴图
   renderer.shadowMap.enabled = true;
+  //开启渲染器正确的物理渲染方法
+  renderer.physicallyCorrectLights = true;
 
   //9.创建轨道控制器
   const controls = new OrbitControls( camera, renderer.domElement);

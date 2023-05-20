@@ -2,6 +2,7 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";//导入轨道控制器
 import { onMounted, ref } from "vue";
+import * as dat from "dat.gui";//导入dat.gui
 import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader";
 
   //1.创建场景
@@ -54,10 +55,27 @@ import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader";
   const ambientLight = new THREE.AmbientLight(0xffffff, 0.1);//增加环境光（无光源，四面八方都是）
   scene.add(ambientLight);//环境光不需要设置位置
   const directtionaLight = new THREE.DirectionalLight(0xffffff, 0.9);//增加直照光（有光源）
-  directtionaLight.position.set(10, 10, 10);
+  directtionaLight.position.set(5, 5, 5);
+
+  //增加灯光阴影
   directtionaLight.castShadow = true;//光线投下阴影
   directtionaLight.shadow.radius = 20;
+  directtionaLight.shadow.mapSize.set(4096, 4096);//阴影贴图分辨率 
+
+  //增加阴影相机
+  directtionaLight.shadow.camera.near = 0.5;
+  directtionaLight.shadow.camera.far = 500;
+  directtionaLight.shadow.camera.top = 5;
+  directtionaLight.shadow.camera.bottom = -5;
+  directtionaLight.shadow.camera.left = -5;
+  directtionaLight.shadow.camera.right = 5;
+
   scene.add(directtionaLight);
+  //初始化gui用户参数控制
+  const gui = new dat.GUI();
+  gui.add(directtionaLight.shadow.camera, "near").min(0).max(10).step(0.1).onChange(()=>{
+    directtionaLight.shadow.camera.updateProjectionMatrix();//更改正交相机
+  })
 
   //8.初始化渲染器
   const renderer = new THREE.WebGLRenderer();
