@@ -50,39 +50,41 @@ import * as dat from "dat.gui";//导入dat.gui
   const axesHelper = new THREE.AxesHelper(5);
   scene.add(axesHelper);
 
+  // 设置时钟
+  const clock = new THREE.Clock();
+
   //7.增加灯光
-  const ambientLight = new THREE.AmbientLight(0xffffff, 0.1);//增加环境光,0.1强度（无光源，四面八方都是）
-  scene.add(ambientLight);//环境光不需要设置位置
-  const spotLight = new THREE.SpotLight(0xffffff, 0.9);//增加聚光灯，0.9强度（有光源
-  spotLight.position.set(5, 5, 5);
+  const pointLight = new THREE.PointLight(0xff0000, 1);//增加环境光,0.1强度（无光源，四面八方都是
+  const smallBall= new THREE.Mesh(
+    new THREE.SphereGeometry(0.1,20, 20),
+    new THREE.MeshBasicMaterial({color: 0xff0000})
+  );
+  smallBall.position.set(2, 2, 2);
+  smallBall.add(pointLight);
+  scene.add(smallBall);//环境光不需要设置位置
 
   //增加灯光阴影
-  spotLight.castShadow = true;//光线投下阴影
-  spotLight.shadow.radius = 20;
-  spotLight.shadow.mapSize.set(4096, 4096);//阴影贴图分辨率
-  spotLight.target = sphere;//聚光灯聚光目标
-  spotLight.angle = Math.PI / 6;//聚光灯光线角度
-  spotLight.distance = 0;//设置聚光灯衰减距离,值越大衰减越小，但0为不衰减
-  spotLight.penumbra = 0;//聚光灯半影的衰减效果,但0为不衰减
-  spotLight.decay = 1;//光沿着距离衰减，默认为1，为2时是现实世界的衰减情况,需要开启renderer.physicallyCorrectLights
-  spotLight.intensity = 2;//调节聚光灯强度
+  pointLight.castShadow = true;//光线投下阴影
+  pointLight.shadow.radius = 20;
+  pointLight.shadow.mapSize.set(4096, 4096);//阴影贴图分辨率
+  pointLight.distance = 0;//设置光照距离为多少的时候为0，但0为不衰减
+  pointLight.penumbra = 0;//光照半影的衰减效果,但0为不衰减
+  pointLight.decay = 1;//光沿着距离衰减，默认为1，为2时是现实世界的衰减情况,需要开启renderer.physicallyCorrectLights
+  pointLight.intensity = 2;//调节光照强度
 
   //增加光的投射相机
-  spotLight.shadow.camera.near = 0.5;
-  spotLight.shadow.camera.far = 500;
-  spotLight.shadow.camera.top = 5;
-  spotLight.shadow.camera.bottom = -5;
-  spotLight.shadow.camera.left = -5;
-  spotLight.shadow.camera.right = 5;
+  pointLight.shadow.camera.near = 0.5;
+  pointLight.shadow.camera.far = 500;
+  pointLight.shadow.camera.top = 5;
+  pointLight.shadow.camera.bottom = -5;
+  pointLight.shadow.camera.left = -5;
+  pointLight.shadow.camera.right = 5;
 
-  scene.add(spotLight);
   //初始化gui用户参数控制
   const gui = new dat.GUI();
-  gui.add(sphere.position, "x").min(-5).max(5).step(0.1);
-  gui.add(spotLight, "angle").min(0).max(Math.PI / 2).step(0.1);
-  gui.add(spotLight, "distance").min(0).max(10).step(0.01);
-  gui.add(spotLight, "penumbra").min(0).max(10).step(0.01);
-  gui.add(spotLight, "decay").min(0).max(5).step(0.01);
+  gui.add(pointLight.position, "x").min(-5).max(5).step(0.1);
+  gui.add(pointLight, "distance").min(0).max(10).step(0.01);
+  gui.add(pointLight, "decay").min(0).max(5).step(0.01);
 
   //8.初始化渲染器
   const renderer = new THREE.WebGLRenderer();
@@ -103,6 +105,11 @@ import * as dat from "dat.gui";//导入dat.gui
 
   /***********实际渲染***********/
   function render(){//渲染函数 requestAnimationFrame默认传入时间
+    let time = clock.getElapsedTime();
+    smallBall.position.x = Math.sin(time) * 3;
+    smallBall.position.z = Math.cos(time) * 3;
+    smallBall.position.y = 2 + Math.sin(time*10) * 0.5;
+
     controls.update();
     renderer.render(scene, camera);
     requestAnimationFrame(render);//1.请求动画帧，每帧重新渲染。浏览器原生函数 2.下一帧时函数自调用
